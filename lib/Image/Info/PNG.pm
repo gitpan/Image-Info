@@ -5,18 +5,6 @@ package Image::Info::PNG;
 # This library is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-=begin register
-
-MAGIC: /^\x89PNG\x0d\x0a\x1a\x0a/
-
-Information from IHDR, PLTE, gAMA, pHYs, tEXt, tIME chunks are
-extracted.  The sequence of chunks are also given by the C<PNG_Chunks>
-key.
-
-=end register
-
-=cut
-
 use strict;
 
 sub my_read
@@ -82,7 +70,7 @@ sub process_file
 
 	    $info->push_info(0, "width", $w);
 	    $info->push_info(0, "height", $h);
-	    $info->push_info(0, "SampleFormat", "U$depth");
+	    $info->push_info(0, "sample_format", "U$depth");
 	    $info->push_info(0, "color_type", $ctype);
 
 	    $info->push_info(0, "Compression", $compression);
@@ -96,7 +84,7 @@ sub process_file
 		push(@table, sprintf("#%02x%02x%02x",
 				     unpack("C3", substr($data, 0, 3, ""))));
 	    }
-	    $info->push_info(0, "ColorPalette" => \@table);
+	    $info->push_info(0, "RGB_Palette" => \@table);
 	}
 	elsif ($type eq "gAMA" && $len == 4) {
 	    $info->push_info(0, "Gamma", unpack("N", $data)/100_000);
@@ -113,12 +101,8 @@ sub process_file
 	    }
 	    $res = ($res_x == $res_y) ? $res_x : "$res_x/$res_y";
 	    if ($unit) {
-		if ($unit == 1) {
-		    $res .= " dpm";
-		}
-		else {
-		    $res .= " png-unit-$unit";
-		}
+		$unit = "dpm" if $unit == 1;
+		$res .= " $unit";
 	    }
 	    $info->push_info(0, "resolution" => $res)
 	}
@@ -145,10 +129,6 @@ sub process_file
     }
 
     $info->push_info(0, "PNG_Chunks", @chunks);
-
-    unless ($info->get_info(0, "resolution")) {
-	$info->push_info(0, "resolution", "1/1");
-    }
 }
 
 1;

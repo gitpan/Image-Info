@@ -5,22 +5,6 @@ package Image::Info::GIF;
 # This library is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
-=begin register
-
-MAGIC: /^GIF8[79]a/
-
-Both GIF87a and GIF89a are supported and the version number is found
-as C<GIF_Version> for the first image.  GIF files can contain multiple
-images, and information for all images will be returned if
-image_info() is called in list context.  The Netscape-2.0 extention to
-loop animation sequences is represented by the C<GIF_Loop> key for the
-first image.  The value is either "forever" or a number indicating
-loop count.
-
-=end register
-
-=cut
-
 use strict;
 
 sub my_read
@@ -74,14 +58,8 @@ sub process_file
     }
 
     if ($aspect) {
-	$aspect = ($aspect + 15) / 64;
-	$info->push_info(0, "PixelAspectRatio" => $aspect);
-
-	# XXX is this correct????
-	$info->push_info(0, "resolution", "1/$aspect");
-    }
-    else {
-	$info->push_info(0, "resolution", "1/1");
+	$info->push_info(0, "PixelAspectRatio" => ($aspect + 15) / 64);
+	# XXX shold set XResolution/YResulution...
     }
 
     $info->push_info(0, "file_media_type" => "image/gif");
@@ -93,7 +71,6 @@ sub process_file
 
     my $img_no = 0;
     my @comments;
-    my @warnings;
 
     while (1) {
 	my $intro = ord(my_read($fh, 1));
@@ -105,7 +82,7 @@ sub process_file
 
 	    if (@comments) {
 		for (@comments) {
-		    $info->push_info(0, "Comment", $_);
+		    $info->push_info(0, "comment", $_);
 		}
 		@comments = ();
 	    }
@@ -121,35 +98,32 @@ sub process_file
 
 	    if ($packed & 0x80) {
 		# yes, we have a local color table
-		my $ct_size = 1 << (($packed & 0x07) + 1);
+		my $ct_size = 1 << ($packed & 0x07 + 1);
 		$info->push_info($img_no, "LColorTableSize" => $ct_size);
 		my $color_table = my_read($fh, $ct_size * 3);
 	    }
 
 	    $info->push_info($img_no, "Interlace" => "GIF")
-		if $packed & 0x40;
+		if $packed & 0x040;
 
 	    my $lzw_code_size = ord(my_read($fh, 1));
 	    #$info->push_info($img_no, "LZW_MininmCodeSize", $lzw_code_size);
 	    read_data_blocks($fh);  # skip image data
 	    $img_no++;
 	}
-	elsif ($intro == 0x21) {  # GIF89a extension
-	    push(@warnings, "GIF 89a extensions in 87a")
-		if $version eq "87a";
-
+	elsif ($version eq "89a" && $intro == 0x21) {  # GIF89a extension
 	    my $label = ord(my_read($fh, 1));
 	    my $data = read_data_blocks($fh);
 	    if ($label == 0xF9 && length($data) == 4) {  # Graphic Control
 		my($packed, $delay, $trans_color) = unpack("CvC", $data);
-		my $disposal_method = ($packed >> 2) & 0x07;
+		my $disposal_method = ($packed >> 3) & 0x07;
 		$info->push_info($img_no, "DisposalMethod", $disposal_method)
 		    if $disposal_method;
 		$info->push_info($img_no, "UserInput", 1)
-		    if $packed & 0x02;
+		    if $packed & 0x40;
 		$info->push_info($img_no, "Delay" => $delay/100) if $delay;
 		$info->push_info($img_no, "TransparencyIndex" => $trans_color)
-		    if $packed & 0x01;
+		    if $packed & 0x80;
 	    }
 	    elsif ($label == 0xFE) {  # Comment
 		$data =~ s/\0+$//;  # is often NUL-terminated
@@ -177,11 +151,7 @@ sub process_file
     }
 
     for (@comments) {
-	$info->push_info(0, "Comment", $_);
-    }
-
-    for (@warnings) {
-	$info->push_info(0, "Warn", $_);
+	$info->push_info(0, "comment", $_);
     }
 }
 

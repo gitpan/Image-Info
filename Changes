@@ -1,78 +1,38 @@
-2000-11-30   Gisle Aas <gisle@ActiveState.com>
+2001-03-24   Gisle Aas <gisle@ActiveState.com>
 
-    Release 1.04
+    Release 0.06
 
-    Allow extra image_info() arguments to pass through to the
-    image format handlers.  This make the histogram and
-    color palette returns functional again.
+    Decoding of Exif MakerNote info from Jay Soffian <jay@loudcloud.com>.
+    His patch supports the following camera models:
 
-    Distribute a copy of lib/Image/Info.pm so that search.cpan.org
-    finds it.
+       NIKON E700  
+       NIKON E800  
+       NIKON E900  
+       NIKON E900S 
+       NIKON E910  
+       NIKON E950  
+       NIKON E880  
+       NIKON E990  
+       NIKON CORPORATION NIKON D1  
+       OLYMPUS OPTICAL CO.,LTD C2000Z  
+       OLYMPUS OPTICAL CO.,LTD C2100UZ 
+       OLYMPUS OPTICAL CO.,LTD C2500L  
+       OLYMPUS OPTICAL CO.,LTD C3030Z  
+       OLYMPUS OPTICAL CO.,LTD E-10    
+       FUJIFILM FinePix4900ZOOM  
+       FUJIFILM FinePix40i       
+       FUJIFILM FinePix4700 ZOOM 
+       FUJIFILM FinePixS1Pro     
+       CASIO QV-3000EX  
+       Canon Canon EOS D30            
+       Canon Canon DIGITAL IXUS       
+       Canon Canon DIGITAL IXUS 300   
+       Canon Canon PowerShot G1 
+       Canon Canon PowerShot Pro90 IS
+       Canon Canon PowerShot S10
+       Canon Canon PowerShot S20
 
-
-
-2000-11-13   Gisle Aas <gisle@ActiveState.com>
-
-    Release 1.03
-
-    Support for even more image formats added by Jerrad Pierce:
-
-       - Added support for ASCII and BMP/DIB/RLE
-
-       - Palettes are only returned if requested (see documentation)
-
-       - Added Luminance Histogram for ASCII, XBM, XPM
-
-
-
-2000-11-10   Gisle Aas <gisle@ActiveState.com>
-
-    Release 1.02
-
-    Avoid direct hardcoding of image file magic and doc by
-    generating lib/Image/Info.pm in Makefile.PL
-
-    XBM/XPM/SVG support contributed by
-    Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org>
-
-    
-
-
-2000-10-31   Gisle Aas <gisle@ActiveState.com>
-
-    Release 1.01
-
-    GIF parsing fixes from Ralf Steines <metamonk@yahoo.com>:
-
-      - GIF 'DisposalMethod' and 'UserInput' now show proper values.
-
-      - GIF 'TransparencyIndex' now appears in the info hash.
-
-      - GIF anims with local color tables don't fail anymore
-        (table size calculation bug).
-
-      - Added: GIFs marked as 87a which contain graphics control
-        extension blocks don't fail anymore, GIF is parsed anyway
-        but $info->{warn} contains 'GIF 89a extensions in 87a'.
-
-
-
-2000-10-18   Gisle Aas <gisle@ActiveState.com>
-
-    Release 1.00
-
-    IO::String is now a PREREQ module.
-
-    Added PPM/PGM/PBM support
-
-    Improved documentation.
-
-    Standardized on how "resolution" is expressed.  The field in
-    now mandatory.
-
-    All comments are now found as "Comment" tag.
-
-    Pick up data about thumbnails embedded in JPEG Exif files.
+    Included Jay Soffian's test program called 'exifdump'
 
 
 
