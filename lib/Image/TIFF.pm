@@ -8,7 +8,7 @@ package Image::TIFF;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.10';
 
 my @types = (
   undef,

@@ -5,6 +5,24 @@ package Image::Info::JPEG;
 # This library is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 
+=begin register
+
+MAGIC: /^\xFF\xD8/
+
+For JPEG files we extract information both from C<JFIF> and C<Exif>
+application chunks.
+
+C<Exif> is the file format written by most digital cameras.  This
+encode things like timestamp, camera model, focal length, exposure
+time, aperture, flash usage, GPS position, etc.  The following web
+page contain description of the fields that can be present:
+
+ http://www.butaman.ne.jp/~tsuruzoh/Computer/Digicams/exif-e.html
+
+=end register
+
+=cut
+
 use strict;
 
 my %sof = (
@@ -35,8 +53,13 @@ sub my_read
 
 sub process_file
 {
+    my($info, $fh, $cnf) = @_;
+    _process_file($info, $fh, 0);
+}
+
+sub _process_file
+{
     my($info, $fh, $img_no) = @_;
-    $img_no ||= 0;
 
     my $soi = my_read($fh, 2);
     die "SOI missing" unless $soi eq "\xFF\xD8";
@@ -136,19 +159,19 @@ sub process_app0_jfif
 	$info->push_info(0, "Debug", "Short JFIF chunk");
 	return;
     }
-    my($ver_hi, $ver_lo, $units, $x_density, $y_density, $x_thumb, $y_thumb) =
+    my($ver_hi, $ver_lo, $unit, $x_density, $y_density, $x_thumb, $y_thumb) =
 	unpack("CC C nn CC", substr($data, 0, 9, ""));
     $info->push_info(0, "JFIF_Version", sprintf("%d.%02d", $ver_hi, $ver_lo));
 
-    my $res = $x_density != $y_density || !$units
+    my $res = $x_density != $y_density || !$unit
 	? "$x_density/$y_density" : $x_density;
 
-    if ($units) {
-	$units = { 0 => "pixels",
-		   1 => "dpi",
-		   2 => "dpcm"
-		 }->{$units} || "units-$units";
-	$res .= " $units";
+    if ($unit) {
+	$unit = { 0 => "pixels",
+		  1 => "dpi",
+		  2 => "dpcm"
+		}->{$unit} || "jfif-unit-$unit";
+	$res .= " $unit";
     }
     $info->push_info(0, "resolution", $res);
 
@@ -173,7 +196,7 @@ sub process_app0_jfxx
 	eval {
 	    require IO::String;
 	    my $thumb_fh = IO::String->new($data);
-	    process_file($info, $thumb_fh, 1);
+	    _process_file($info, $thumb_fh, 1);
 	};
 	$info->push_info(1, "error" => $@) if $@;
     }
@@ -196,13 +219,32 @@ sub process_app1_exif
 	for (@$ifd) {
 	    $info->push_info($i, $_->[0], $_->[3]);
 	}
+
+	# If we find JPEGInterchangeFormat/JPEGInterchangeFormatLngth,
+	# then we should apply process_file kind of recusively to extract
+	# information of this (thumbnail) image file...
+	if (my($ipos) = $info->get_info($i, "JPEGInterchangeFormat", 1)) {
+	    my($ilen) = $info->get_info($i, "JPEGInterchangeFormatLngth", 1);
+	    die unless $ilen;
+	    my $jdata = substr($data, $ipos, $ilen);
+	    #$info->push_info($i, "JPEGImage" => $jdata);
+
+	    require IO::String;
+	    my $fh = IO::String->new($jdata);
+	    _process_file($info, $fh, $i);
+	}
+
+	# Turn XResolution/YResolution into 'resolution'
+	my($xres) = $info->get_info($i, "XResolution", 1);
+	my($yres) = $info->get_info($i, "YResolution", 1);
+	my($unit) = $info->get_info($i, "ResolutionUnit", 1);
+	my $res = "1/1";  # default;
+	if ($xres && $yres) {
+	    $res = ($xres == $yres) ? $xres : "$xres/$yres";
+	}
+	$res .= " $unit" if $unit && $unit ne "pixels";
+	$info->push_info($i, "resolution", $res);
     }
-
-    # XXX Should move XResolution/YResolution into 'resolution'
-
-    # XXX If we find JPEGInterchangeFormat/JPEGInterchangeFormatLngth,
-    # then we should apply process_file kind of recusively to extract
-    # information of this (thumbnail) image file...
 }
 
 sub process_app14_adobe
