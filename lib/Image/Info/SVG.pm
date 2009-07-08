@@ -1,84 +1,39 @@
+# -*- perl -*-
+
+#
+# Author: Slaven Rezic
+#
+# Copyright (C) 2009 Slaven Rezic. All rights reserved.
+# This package is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+
 package Image::Info::SVG;
 
-$VERSION = '1.04';
-
 use strict;
-no strict 'refs';
-use XML::Simple;
+use vars qw($VERSION @PREFER_MODULE $USING_MODULE);
+$VERSION = '2.00';
 
-sub process_file {
-    my($info, $source) = @_;
-    my(@comments, @warnings, %info, $comment, $img, $imgdata, $xs);
-    local($_);
+@PREFER_MODULE = qw(Image::Info::SVG::XMLLibXMLReader
+		    Image::Info::SVG::XMLSimple
+		  )
+    if !@PREFER_MODULE;
 
-    while(<$source>){
-	if( ! exists($info{standalone}) && /standalone="(.+?)"/ ){
-	    $info{standalone} = $1;
-	}
-	if( /<!--/ .. /-->/ ){
-	    $comment .= $_;
-	}
-	if( /-->/ ){
-	    $comment =~ s/<!--\s*//;
-	    $comment =~ s/\s*-->//;
-	    chomp($comment);
-	    push @comments, $comment;
-	    $comment = '';
-	}
-	$imgdata .= $_;
-    }
-
-    if( $imgdata !~ /<svg/ ){
-	return $info->push_info(0, "error", "Not a valid SVG image");
-    }
-
-    local $SIG{__WARN__} = sub {
-	push(@warnings, @_);
-    };
-
-    $xs = XML::Simple->new;
-    $img = $xs->XMLin($imgdata);
-
-#    use Data::Dumper; print Dumper($img);
-
-    $info->push_info(0, "color_type" => "sRGB");
-    $info->push_info(0, "file_ext" => "svg");
-    # "image/svg+xml" is the official MIME type
-    $info->push_info(0, "file_media_type" => "image/svg+xml");
-
-    $info->push_info(0, "height", $img->{height});
-    $info->push_info(0, "width", $img->{width});
-    $info->push_info(0, "SVG_StandAlone", $info{standalone});
-    $info->push_info(0, "SVG_Version", $img->{version} || 'unknown');
-
-    # XXX Description, title etc. could be tucked away in a <g> :-(
-    $info->push_info(0, "ImageDescription", $img->{desc}) if $img->{desc};
-    $info->push_info(0, "SVG_Title", $img->{title}) if $img->{title};
-
-#    $info->push_info(0, "SamplesPerPixel", -1);
-#    $info->push_info(0, "resolution", "1/1");
-#    $info->push_info(0, "BitsPerSample", 8);
-
-    if( $img->{image} ){
-	if( ref($img->{image}) eq 'ARRAY' ){
-	    foreach my $img (@{$img->{image}}){
-		$info->push_info(0, "SVG_Image", $img->{'xlink:href'});
-	    }
-	}
-	else{
-	    $info->push_info(0, "SVG_Image", $img->{image}->{'xlink:href'});
+TRY_MODULE: {
+    for my $try_module (@PREFER_MODULE) {
+	if (eval qq{ require $try_module; 1 }) {
+	    my $sub = $try_module . '::process_file';
+	    no strict 'refs';
+	    *process_file = \&{$sub};
+	    $USING_MODULE = $try_module;
+	    last TRY_MODULE;
 	}
     }
-
-    for (@comments) {
-	$info->push_info(0, "Comment", $_);
-    }
-    
-    for (@warnings) {
-	$info->push_info(0, "Warn", $_);
-    }
+    die "Cannot require any of @PREFER_MODULE...\n";
 }
+
 1;
+
 __END__
 
 =pod
@@ -139,17 +94,31 @@ Processes one file and sets the found info fields in the C<$info> object.
 
 =head1 FILES
 
-This module requires L<XML::Simple>.
+This module requires either L<XML::LibXML::Reader> or L<XML::Simple>.
+
+=head1 COMPATIBILITY
+
+Previous versions (until Image-Info-1.28) used L<XML::Simple> as the
+underlying parser. Since Image-Info-1.29 the default parser is
+L<XML::LibXML::Reader> (which is much more faster, memory-efficient,
+and does not rely on regular expressions for some aspects of XML
+parsing. If for some reason you need the old parser, you can force it
+by setting the variable C<@Image::Info::SVG::PREFER_MODULE> as early
+as possible:
+
+    use Image::Info;
+    @Image::Info::SVG::PREFER_MODULE = qw(Image::Info::SVG::XMLSimple Image::Info::SVG::XMLLibXMLReader);
+
+The variable C<$Image::Info::SVG::USING_MODULE> can be queried to see
+which parser is in use (after B<Image::Info::SVG> is required).
 
 =head1 SEE ALSO
 
-L<Image::Info>, L<XML::Simple>, L<expat>
+L<Image::Info>, L<XML::LibXML::Reader>, L<XML::Simple>
 
 =head1 NOTES
 
-For more information about SVG see:
-
- http://www.w3.org/Graphics/SVG/
+For more information about SVG see L<http://www.w3.org/Graphics/SVG/>
 
 Random notes:
 
@@ -166,7 +135,9 @@ Random notes:
 
 =head1 AUTHOR
 
-Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org>
+Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org> wrote the original code based on L<XML::Simple>
+
+Slaven Rezic <srezic@cpan.org> wrote the code using L<XML::LibXML::Reader>
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
