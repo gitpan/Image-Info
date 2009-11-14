@@ -12,13 +12,13 @@ package Image::Info;
 # This library is free software; you can redistribute it and/or
 # modify it under the same terms as Perl v5.8.8 itself.
 #
-# Now maintained by Tels - (c) 2006 - 2008.
-# Latest release done by Slaven Rezic - (c) 2008 - 2009.
+# Previoisly maintained by Tels - (c) 2006 - 2008.
+# Currently maintained by Slaven Rezic - (c) 2008 - 2009.
 
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.30';
+$VERSION = '1.30_50';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -85,9 +85,16 @@ sub _source
 {
     my $source = shift;
     if (!ref $source) {
-        require Symbol;
-        my $fh = Symbol::gensym();
-        open($fh, $source) || return _os_err("Can't open $source");
+	my $fh;
+	if ($] < 5.006) {
+	    require Symbol;	
+	    $fh = Symbol::gensym();
+	    open($fh, $source) || return _os_err("Can't open $source");
+	}
+	else {
+	    open $fh, '<', $source
+		or return _os_err("Can't open $source");
+	}
 	${*$fh} = $source;  # keep filename in case somebody wants to know
         binmode($fh);
         $source = $fh;
@@ -114,11 +121,13 @@ sub _head
     my $source = shift;
     my $head;
 
-    # tiny.pgm is 11 bytes
-    my $to_read = 11;
+    # Originally was 32 bytes.
+    # In the meantime lowered to 11 bytes.
+    # But XBM probably need more because of a leading comment.
+    my $to_read = 64;
     my $read = read($source, $head, $to_read);
 
-    return _os_err("Couldn't read $to_read bytes") if $read != $to_read;
+    return _os_err("Couldn't read any bytes") if !$read;
 
     if (ref($source) eq "IO::String") {
 	# XXX workaround until we can trap seek() with a tied file handle
@@ -334,7 +343,7 @@ The corresponding value is a string like: "image/png" or "image/jpeg".
 
 =item file_ext
 
-The is the suggested file name extention for a file of the given file
+The is the suggested file name extension for a file of the given file
 format.  The value is a 3 letter, lowercase string like "png", "jpg".
 
 =item width
@@ -447,9 +456,9 @@ Copyright 1999-2004 Gisle Aas.
 
 See the CREDITS file for a list of contributors and authors.
 
-Now maintained by Tels - (c) 2006 - 2008.
+Tels - (c) 2006 - 2008.
 
-Last release done by Slaven Rezic - (c) 2008 - 2009.
+Current maintainer: Slaven Rezic - (c) 2008 - 2009.
 
 =head1 LICENSE
 
@@ -457,3 +466,7 @@ This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl v5.8.8 itself.
 
 =cut
+
+# Local Variables: 
+# mode: cperl
+# End: 

@@ -7,7 +7,7 @@ package Image::Info::JPEG;
 
 # maintained by Tels 2007 - 2008
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 =begin register
 
@@ -16,16 +16,12 @@ MAGIC: /^\xFF\xD8/
 For JPEG files we extract information both from C<JFIF> and C<Exif>
 application chunks.
 
-C<Exif> is the file format written by most digital cameras.  This
+C<Exif> is the file format written by most digital cameras. This
 encode things like timestamp, camera model, focal length, exposure
-time, aperture, flash usage, GPS position, etc.  The following web
-page contain description of the fields that can be present:
-
- http://www.ba.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+time, aperture, flash usage, GPS position, etc.
 
 The C<Exif> spec can be found at:
-
- http://www.exif.org/specifications.html
+L<http://www.exif.org/specifications.html>.
 
 =end register
 
@@ -55,7 +51,7 @@ sub my_read
     my $buf;
     my $n = read($source, $buf, $len);
     die "read failed: $!" unless defined $n;
-    die "short read ($len/$n)" unless $n == $len;
+    die "short read ($len/$n) at pos " . tell($source) unless $n == $len;
     $buf;
 }
 
@@ -100,9 +96,17 @@ sub _process_file
     $info->push_info($img_no, "file_ext" => "jpg");
 
     while (1) {
-        my($ff, $mark, $len) = unpack("CCn", my_read($fh, 4));
+        my($ff, $mark) = unpack("CC", my_read($fh, 2));
         last if $ff != 0xFF;
+	if ($mark == 0xFF) {
+	    # JPEG markers can be padded with unlimited 0xFF's
+	    for (;;) {
+		($mark) = unpack("C", my_read($fh, 1));
+		last if $mark != 0xFF;
+            }
+	}
         last if $mark == 0xDA || $mark == 0xD9;  # SOS/EOI
+	my($len) = unpack("n", my_read($fh, 2));
 	last if $len < 2;
         process_chunk($info, $img_no, $mark, my_read($fh, $len - 2));
     }
@@ -234,7 +238,7 @@ sub process_app0_jfxx
 		     { 0x10 => "JPEG thumbnail",
 		       0x11 => "Bitmap thumbnail",
 		       0x13 => "RGB thumbnail",
-		     }->{$code} || "Unknown extention code $code");
+		     }->{$code} || "Unknown extension code $code");
 
     if ($code == 0x10) {
 	eval {

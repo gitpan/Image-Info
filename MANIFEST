@@ -10,9 +10,9 @@ img/gps.jpg
 img/graph.svg
 img/interlace.png		Interlaced PNG example
 img/le.tif
-img/test0-fuji.jpg		Testcase for RT #49546
-img/test1-fuji.jpg		Testcase for RT #49546
+img/test-gimp.xbm
 img/test.gif			An GIF example
+img/test.ico
 img/test.jpg			An Exif example from my Digicam
 img/test.pbm
 img/test.pgm
@@ -23,6 +23,8 @@ img/test.svg
 img/test.tif
 img/test.xbm
 img/test.xpm
+img/test0-fuji.jpg		Testcase for RT #49546
+img/test1-fuji.jpg		Testcase for RT #49546
 img/tiny.pgm
 img/ztxt.png			PNG example with ztxt chunk
 imgdump				Test driver script
@@ -37,9 +39,14 @@ inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
+lib/Bundle/Image/Info/PNG.pm
+lib/Bundle/Image/Info/SVG.pm
+lib/Bundle/Image/Info/XBM.pm
+lib/Bundle/Image/Info/XPM.pm
 lib/Image/Info.pm
 lib/Image/Info/BMP.pm
 lib/Image/Info/GIF.pm
+lib/Image/Info/ICO.pm
 lib/Image/Info/JPEG.pm
 lib/Image/Info/PNG.pm
 lib/Image/Info/PPM.pm
@@ -58,8 +65,9 @@ README
 SIGNATURE
 t/00_basics.t
 t/bmp.t
-t/fuji_s1000fd_substr_outside_of_string.t	Testcase for RT #49546
 t/exif.t
+t/fuji_s1000fd_substr_outside_of_string.t	Testcase for RT #49546
+t/ico.t
 t/jpg_hang.t
 t/png.t
 t/pod.t
@@ -70,3 +78,6 @@ t/tiff.t
 t/tiff_e.t
 t/tiny-pgm.t
 TODO
+xt/bench.t
+xt/compare.t
+xt/mass.t

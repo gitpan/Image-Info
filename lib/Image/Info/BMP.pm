@@ -1,5 +1,5 @@
 package Image::Info::BMP;
-$VERSION = '1.01';
+$VERSION = '1.02';
 use strict;
 
 sub process_file {
@@ -93,7 +93,7 @@ __END__
 
 =head1 NAME
 
-Image::Info:BMP - Windows Device Indepdent Bitmap support for Image::Info
+Image::Info::BMP - Windows Device Indepdent Bitmap support for Image::Info
 
 =head1 SYNOPSIS
 
@@ -153,9 +153,7 @@ L<Image::Info>
 
 =head1 NOTES
 
-For more information about BMP see:
-
- http://msdn.microsoft.com
+For more information about BMP see L<http://msdn.microsoft.com>.
 
 Random notes:
 

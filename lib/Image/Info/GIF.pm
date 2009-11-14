@@ -1,4 +1,5 @@
 package Image::Info::GIF;
+$VERSION = '1.01';
 
 # Copyright 1999-2000, Gisle Aas.
 #
@@ -12,7 +13,7 @@ MAGIC: /^GIF8[79]a/
 Both GIF87a and GIF89a are supported and the version number is found
 as C<GIF_Version> for the first image.  GIF files can contain multiple
 images, and information for all images will be returned if
-image_info() is called in list context.  The Netscape-2.0 extention to
+image_info() is called in list context.  The Netscape-2.0 extension to
 loop animation sequences is represented by the C<GIF_Loop> key for the
 first image.  The value is either "forever" or a number indicating
 loop count.
@@ -29,7 +30,7 @@ sub my_read
     my $buf;
     my $n = read($source, $buf, $len);
     die "read failed: $!" unless defined $n;
-    die "short read ($len/$n)" unless $n == $len;
+    die "short read ($len/$n) at pos " . tell($source) unless $n == $len;
     $buf;
 }
 
@@ -98,6 +99,7 @@ sub process_file
     my @warnings;
 
     while (1) {
+	last if eof($fh); # EOF
 	my $intro = ord(my_read($fh, 1));
 	if ($intro == 0x3B) {  # trailer (end of image)
 	    last;

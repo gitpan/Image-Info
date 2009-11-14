@@ -1,5 +1,28 @@
 Revision history for Image::Info
 
+2009-11-14  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.30_50
+
+    Support for Microsoft .ico files (Image::Info::ICO).
+
+    Fixes in JPEG parsing (skip pad 0xFF in markers).
+
+    Fixes in GIF reader ("trailer" seems to be optional).
+
+    Somewhat better recognition of XBM files.
+
+    XPM handling: Corrected color parsing. Try harder to find X11's
+    rgb.txt. Ignore comments in rgb.txt.
+
+    Reordered magic checks to have more common image formats first.
+
+    Introduced Bundles.
+
+    Some Pod cleanups.
+
+    Additional author tests in xt.    
+
 2009-10-31  Slaven Rezic  <srezic@cpan.org>
 
     Release 1.30
@@ -504,7 +527,7 @@ Revision history for Image::Info
 
     Various tweaks to the reported info keys for JPEG/PNG/GIF.
 
-    Support Netscape's Loop extention to GIF.
+    Support Netscape's Loop extension to GIF.
 
     Support ColorTable dump for GIF and PNG.
 

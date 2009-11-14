@@ -20,7 +20,7 @@ key.
 use strict;
 use vars qw/$VERSION/;
 
-$VERSION = 1.00;
+$VERSION = 1.01;
 
 # Test for Compress::Zlib (for reading zTXt chunks)
 my $have_zlib = 0;
@@ -35,7 +35,7 @@ sub my_read
     my $buf;
     my $n = read($source, $buf, $len);
     die "read failed: $!" unless defined $n;
-    die "short read ($len/$n)" unless $n == $len;
+    die "short read ($len/$n) at pos " . tell($source) unless $n == $len;
     $buf;
 }
 

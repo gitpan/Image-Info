@@ -7,7 +7,7 @@ package Image::Info::PPM;
 
 =begin register
 
-MAGIC: /^P[1-6]/;
+MAGIC: /^P[1-6]/
 
 =item PBM/PGM/PPM
 
@@ -20,7 +20,7 @@ All information available is extracted.
 use strict;
 use vars qw/$VERSION/;
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 sub process_file {
     my($info, $fh) = @_;
@@ -90,7 +90,7 @@ sub process_file {
 
 =head1 NAME
 
-Image::Info:PPM - PPM support Image::Info
+Image::Info::PPM - PPM support Image::Info
 
 =head1 SYNOPSIS
 
@@ -104,7 +104,7 @@ Image::Info:PPM - PPM support Image::Info
 
 =head1 DESCRIPTION
 
-This modules adds ppm support to Image::Info.
+This modules adds ppm support to L<Image::Info>.
 
 It is loaded and used automatically.
 

@@ -1,6 +1,6 @@
 package Image::Info::TIFF;
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 use strict;
 use Config;
@@ -39,7 +39,7 @@ sub _read
     my $buf;
     my $n = read($source, $buf, $len);
     die "read failed: $!" unless defined $n;
-    die "short read ($len/$n)" unless $n == $len;
+    die "short read ($len/$n) at pos " . tell($source) unless $n == $len;
     $buf;
 }
 
@@ -265,7 +265,7 @@ The C<TIFF> spec can be found at:
 L<http://partners.adobe.com/public/developer/tiff/>
 
 The EXIF spec can be found at:
-L<http://www.exif.org/>
+L<http://www.exif.org/specifications.html>
 
 =end register
 

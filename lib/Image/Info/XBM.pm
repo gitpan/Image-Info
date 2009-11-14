@@ -1,12 +1,12 @@
 package Image::Info::XBM;
-$VERSION = '1.06';
+$VERSION = '1.07';
 use strict;
 use Image::Xbm 1.07;
 
 sub process_file {
     my($info, $source, $opts) = @_;
 
-    $SIG{__WARN__} = sub {
+    local $SIG{__WARN__} = sub {
 	$info->push_info(0, "Warn", shift);
     };
 
@@ -98,15 +98,16 @@ L<Image::Info>, L<Image::Xbm>
 
 =head1 NOTES
 
-For more information about XBM see:
-
- http://www.dcs.ed.ac.uk/home/mxr/gfx/2d/XBM.txt
+For more information about XBM see
+L<http://www.martinreddy.net/gfx/2d/XBM.txt>.
 
 =head1 AUTHOR
 
 Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org>
 
-Now maintained by Tels - (c) 2006.
+Tels - (c) 2006
+
+Current maintainer: Slaven Rezic <srezic@cpan.org>
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
@@ -115,7 +116,7 @@ modify it under the same terms as Perl itself.
 
 =begin register
 
-MAGIC: /^#define\s+/
+MAGIC: /^(?:\/\*.*\*\/\n)?#define\s/
 
 See L<Image::Info::XBM> for details.
 

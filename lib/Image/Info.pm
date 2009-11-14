@@ -12,13 +12,13 @@ package Image::Info;
 # This library is free software; you can redistribute it and/or
 # modify it under the same terms as Perl v5.8.8 itself.
 #
-# Now maintained by Tels - (c) 2006 - 2008.
-# Latest release done by Slaven Rezic - (c) 2008 - 2009.
+# Previoisly maintained by Tels - (c) 2006 - 2008.
+# Currently maintained by Slaven Rezic - (c) 2008 - 2009.
 
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.30';
+$VERSION = '1.30_50';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -85,9 +85,16 @@ sub _source
 {
     my $source = shift;
     if (!ref $source) {
-        require Symbol;
-        my $fh = Symbol::gensym();
-        open($fh, $source) || return _os_err("Can't open $source");
+	my $fh;
+	if ($] < 5.006) {
+	    require Symbol;	
+	    $fh = Symbol::gensym();
+	    open($fh, $source) || return _os_err("Can't open $source");
+	}
+	else {
+	    open $fh, '<', $source
+		or return _os_err("Can't open $source");
+	}
 	${*$fh} = $source;  # keep filename in case somebody wants to know
         binmode($fh);
         $source = $fh;
@@ -114,11 +121,13 @@ sub _head
     my $source = shift;
     my $head;
 
-    # tiny.pgm is 11 bytes
-    my $to_read = 11;
+    # Originally was 32 bytes.
+    # In the meantime lowered to 11 bytes.
+    # But XBM probably need more because of a leading comment.
+    my $to_read = 64;
     my $read = read($source, $head, $to_read);
 
-    return _os_err("Couldn't read $to_read bytes") if $read != $to_read;
+    return _os_err("Couldn't read any bytes") if !$read;
 
     if (ref($source) eq "IO::String") {
 	# XXX workaround until we can trap seek() with a tied file handle
@@ -140,16 +149,17 @@ sub _os_err
 sub determine_file_format
 {
    local($_) = @_;
-   return "BMP" if /^BM/;
-   return "GIF" if /^GIF8[79]a/;
    return "JPEG" if /^\xFF\xD8/;
    return "PNG" if /^\x89PNG\x0d\x0a\x1a\x0a/;
-   return "PPM" if /^P[1-6]/;;
-   return "SVG" if /^<\?xml/;
+   return "GIF" if /^GIF8[79]a/;
    return "TIFF" if /^MM\x00\x2a/;
    return "TIFF" if /^II\x2a\x00/;
-   return "XBM" if /^#define\s+/;
+   return "BMP" if /^BM/;
+   return "ICO" if /^\000\000\001\000/;
+   return "PPM" if /^P[1-6]/;
    return "XPM" if /(^\/\* XPM \*\/)|(static\s+char\s+\*\w+\[\]\s*=\s*{\s*"\d+)/;
+   return "XBM" if /^(?:\/\*.*\*\/\n)?#define\s/;
+   return "SVG" if /^<\?xml/;
    return undef;
 }
 
@@ -348,7 +358,7 @@ The corresponding value is a string like: "image/png" or "image/jpeg".
 
 =item file_ext
 
-The is the suggested file name extention for a file of the given file
+The is the suggested file name extension for a file of the given file
 format.  The value is a 3 letter, lowercase string like "png", "jpg".
 
 =item width
@@ -452,26 +462,27 @@ For more information see L<Image::Info::BMP>.
 Both GIF87a and GIF89a are supported and the version number is found
 as C<GIF_Version> for the first image.  GIF files can contain multiple
 images, and information for all images will be returned if
-image_info() is called in list context.  The Netscape-2.0 extention to
+image_info() is called in list context.  The Netscape-2.0 extension to
 loop animation sequences is represented by the C<GIF_Loop> key for the
 first image.  The value is either "forever" or a number indicating
 loop count.
+
+=item ICO
+
+This module supports the Microsoft Windows Icon Resource format
+(.ico).
 
 =item JPEG
 
 For JPEG files we extract information both from C<JFIF> and C<Exif>
 application chunks.
 
-C<Exif> is the file format written by most digital cameras.  This
+C<Exif> is the file format written by most digital cameras. This
 encode things like timestamp, camera model, focal length, exposure
-time, aperture, flash usage, GPS position, etc.  The following web
-page contain description of the fields that can be present:
-
- http://www.ba.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
+time, aperture, flash usage, GPS position, etc.
 
 The C<Exif> spec can be found at:
-
- http://www.exif.org/specifications.html
+L<http://www.exif.org/specifications.html>.
 
 =item PNG
 
@@ -493,7 +504,7 @@ The C<TIFF> spec can be found at:
 L<http://partners.adobe.com/public/developer/tiff/>
 
 The EXIF spec can be found at:
-L<http://www.exif.org/>
+L<http://www.exif.org/specifications.html>
 
 =item XBM
 
@@ -523,9 +534,9 @@ Copyright 1999-2004 Gisle Aas.
 
 See the CREDITS file for a list of contributors and authors.
 
-Now maintained by Tels - (c) 2006 - 2008.
+Tels - (c) 2006 - 2008.
 
-Last release done by Slaven Rezic - (c) 2008 - 2009.
+Current maintainer: Slaven Rezic - (c) 2008 - 2009.
 
 =head1 LICENSE
 
@@ -533,3 +544,7 @@ This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl v5.8.8 itself.
 
 =cut
+
+# Local Variables: 
+# mode: cperl
+# End: 

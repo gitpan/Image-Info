@@ -1,15 +1,13 @@
 package Image::Info::XPM;
-$VERSION = '1.06';
-#Path to X11 RGB database
-$RGBLIB ||= "/usr/X11R6/lib/X11/rgb.txt";
+$VERSION = '1.07';
 use strict;
-use Image::Xpm 1.08;
+use Image::Xpm 1.09;
 
 
 sub process_file{
     my($info, $source, $opts) = @_;
 
-    $SIG{__WARN__} = sub {
+    local $SIG{__WARN__} = sub {
 	$info->push_info(0, "Warn", shift);
     };
 
@@ -40,28 +38,44 @@ sub process_file{
 	for(my $y=0; $y<$i->get(-height); $y++){
 	    for(my $x=0; $x<$i->get(-width); $x++){
 		$color = $i->xy($x, $y);
-		if( $color !~ /^#/ ){
+		if( $color =~ /^(none|opaque)$/i ) {
+		    next;
+		} elsif( $color !~ /^#/ ){
 		    unless( exists($RGB{white}) ){
 			local $_;
-			if( open(RGB, $Image::Info::XPM::RGBLIB) ){
+			if( open(RGB, _get_rgb_txt()) ){
 			    while(<RGB>){
+				next if /^\s*!/;
 				/(\d+)\s+(\d+)\s+(\d+)\s+(.*)/;
 				$RGB{$4}=[$1,$2,$3];
 			    }
 			}
 			else{
 			    $RGB{white} = "0 but true";
-			    $info->push_info(0, "Warn", "Unable to open RGB database, you may need to set \$Image::Info::XPM::RGBLIB or define \$RGBLIB in ". __FILE__);
+			    $info->push_info(0, "Warn", "Unable to open RGB database, you may need to set \$Image::Info::XPM::RGBLIB");
 			}
 		    }
 		    $R = $RGB{$color}->[0];
 		    $G = $RGB{$color}->[1];
 		    $B = $RGB{$color}->[2];
 		}
-		else{
+		elsif (length $color == 7) {
 		    $R = hex(substr($color,1,2));
 		    $G = hex(substr($color,3,2));
 		    $B = hex(substr($color,5,2));
+		}
+		elsif (length $color == 13) {
+		    $R = hex(substr($color,1,2));
+		    $G = hex(substr($color,5,2));
+		    $B = hex(substr($color,9,2));
+		}
+		elsif (length $color == 4) {
+		    $R = hex(substr($color,1,1))*16;
+		    $G = hex(substr($color,2,1))*16;
+		    $B = hex(substr($color,3,1))*16;
+		}
+		else {
+		    warn "Unexpected length in color specification '$color'";
 		}
 		if( $opts->{L1D_Histogram} ){
 		    $l1dhist[(.3*$R + .59*$G + .11*$B)]++;
@@ -81,6 +95,32 @@ sub process_file{
 	$info->push_info(0, "Comment", $_);
     }
 }
+
+sub _get_rgb_txt{
+    return $Image::Info::XPM::RGBLIB if defined $Image::Info::XPM::RGBLIB;
+    # list taken from Tk::ColorEditor
+    for my $try(
+	'/usr/local/lib/X11/rgb.txt',
+	'/usr/lib/X11/rgb.txt',
+	'/usr/X11R6/lib/X11/rgb.txt',
+	'/usr/local/X11R5/lib/X11/rgb.txt',
+	'/X11/R5/lib/X11/rgb.txt',
+	'/X11/R4/lib/rgb/rgb.txt',
+	'/usr/openwin/lib/X11/rgb.txt',
+	'/usr/share/X11/rgb.txt', # This is the Debian location
+	'/usr/X11/share/X11/rgb.txt', # seen on a Mac OS X 10.5.1 system
+	'/usr/X11R6/share/X11/rgb.txt', # seen on a OpenBSD 4.2 system
+	'/etc/X11R6/rgb.txt',
+	'/etc/X11/rgb.txt', # seen on HP-UX 11.31
+    ){
+	if( -r $try ){
+	    $Image::Info::XPM::RGBLIB = $try;
+	    return $try;
+	}
+    }
+    undef;
+}
+
 1;
 __END__
 
@@ -111,7 +151,7 @@ except for Compression, Gamma, Interlace, LastModificationTime, as well as:
 
 Reference to an array of all colors used.
 This key is only present if C<image_info> is invoked
-as C<image_info({ColorPaletteE<gt>=1})>.
+as C<image_info($file, ColorPaletteE<gt>=1)>.
 
 =item ColorTableSize
 
@@ -129,7 +169,7 @@ Set to -1 if there is no hotspot.
 
 =item L1D_Histogram
 
-Reference to an array representing a one dimensioanl luminance
+Reference to an array representing a one dimensional luminance
 histogram. This key is only present if C<image_info> is invoked
 as C<image_info($file, L1D_Histogram=E<gt>1)>. The range is from 0 to 255,
 however auto-vivification is used so a null field is also 0,
@@ -153,15 +193,14 @@ XPM Extensions (the most common is XPMEXT) if present.
 
 Processes one file and sets the found info fields in the C<$info> object.
 
-=head1 AUTHOR
-
 =head1 FILES
 
 This module requires L<Image::Xpm>
 
 I<$Image::Info::XPM::RGBLIB> is set to F</usr/X11R6/lib/X11/rgb.txt>
-by default, this is used to resolve textual color names to their RGB
-counterparts.
+or an equivalent path (see the C<_get_rgb_txt> function for the
+complete list) by default, this is used to resolve textual color names
+to their RGB counterparts.
 
 =head1 SEE ALSO
 
@@ -169,21 +208,22 @@ L<Image::Info>, L<Image::Xpm>
 
 =head1 NOTES
 
-For more information about XPM see:
-
- ftp://ftp.x.org/contrib/libraries/xpm-README.html
+For more information about XPM see
+L<ftp://ftp.x.org/contrib/libraries/xpm-README.html>
 
 =head1 CAVEATS
 
 While the module attempts to be as robust as possible, it may not recognize
-older XBMs (Versions 1-3), if this is the case try inserting S</* XPM */>
+older XPMs (Versions 1-3), if this is the case try inserting S</* XPM */>
 as the first line.
 
 =head1 AUTHOR
 
 Jerrad Pierce <belg4mit@mit.edu>/<webmaster@pthbb.org>
 
-Now maintained by Tels - (c) 2006.
+Tels - (c) 2006.
+
+Now maintained by Slaven Rezic <srezic@cpan.org>.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
