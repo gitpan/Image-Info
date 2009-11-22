@@ -1,5 +1,5 @@
 package Image::Info::GIF;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # Copyright 1999-2000, Gisle Aas.
 #
@@ -44,6 +44,13 @@ sub read_data_blocks
     join("", @data);
 }
 
+sub seek_data_blocks
+{
+    my $source = shift;
+    while (my $len = ord(my_read($source, 1))) {
+	seek($source, $len, 1);
+    }
+}
 
 sub process_file
 {
@@ -135,7 +142,7 @@ sub process_file
 
 	    my $lzw_code_size = ord(my_read($fh, 1));
 	    #$info->push_info($img_no, "LZW_MininmCodeSize", $lzw_code_size);
-	    read_data_blocks($fh);  # skip image data
+	    seek_data_blocks($fh);  # skip image data
 	    $img_no++;
 	}
 	elsif ($intro == 0x21) {  # GIF89a extension
@@ -166,9 +173,9 @@ sub process_file
 		    && $data =~ /^\01/) {
 		    my $loop = unpack("xv", $data);
 		    $loop = "forever" unless $loop;
-		    $info->push_info($img_no, "GIF_Loop" => $loop);
+		    $info->push_info(0, "GIF_Loop" => $loop);
 		} else {
-		    $info->push_info($img_no, "APP-$app-$auth" => $data);
+		    $info->push_info(0, "APP-$app-$auth" => $data);
 		}
 	    }
 	    else {
@@ -176,7 +183,8 @@ sub process_file
 	    }
 	}
 	else {
-	    die "Unknown introduced code $intro, bad GIF";
+	    push @warnings, "Unknown introduced code $intro, ignoring following chunks";
+	    last;
 	}
     }
 
