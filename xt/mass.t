@@ -17,6 +17,7 @@ use Test::More 'no_plan';
 
 use Data::Dumper;
 use DB_File;
+use File::Glob qw(bsd_glob);
 use Getopt::Long;
 use Image::Info qw(image_info);
 use Image::Magick;
@@ -28,8 +29,11 @@ sub usage {
 my $test_ok_db;
 GetOptions("testokdb=s" => \$test_ok_db)
     or usage;
-my @files = @ARGV
-    or usage;
+my @files = @ARGV;
+if (!@files) {
+    diag "Note: no files provided, using supplied test files...";
+    @files = bsd_glob("$FindBin::RealBin/../img/*.{gif,jpg,png,bmp,tif}");
+}
 
 my %tested_ok;
 if ($test_ok_db) {
@@ -81,6 +85,9 @@ sub normalize_info {
     if ($info_ref->[0]->{file_ext} eq 'jpg' && @$info_ref > 1) {
 	@$info_ref = ($info_ref->[0]);
     }	
+    if ($info_ref->[0] && $info_ref->[0]->{file_ext} =~ m{^p[gbp]m$}) {
+	$info_ref->[0]->{file_ext} = 'pnm';
+    }
 }
 
 sub image_magick_to_image_info {
