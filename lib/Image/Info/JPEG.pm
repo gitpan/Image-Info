@@ -7,7 +7,7 @@ package Image::Info::JPEG;
 
 # maintained by Tels 2007 - 2008
 
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 =begin register
 
@@ -22,6 +22,10 @@ time, aperture, flash usage, GPS position, etc.
 
 The C<Exif> spec can be found at:
 L<http://www.exif.org/specifications.html>.
+
+The C<color_type> element may have the following values: C<Gray>,
+C<YCbCr>, and C<CMYK>. Note that detecting C<RGB> and C<YCCK>
+currently does not work, but will hopefully in future.
 
 =end register
 
