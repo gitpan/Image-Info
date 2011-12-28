@@ -37,7 +37,7 @@ recommends	'Bundle::Image::Info::PNG'	=> 0,
 		'Bundle::Image::Info::SVG'	=> 0,
 		;
 
-test_requires	'Test::More'		=> '0.62';
+test_requires	'Test::More'		=> 0;
 
 license		'perl';
 
@@ -50,9 +50,6 @@ all_from	'lib/Image/Info.pm';
 
 # Do not index these
 no_index        directory       => 'img', 'dev';
-
-# Auto-install all dependencies from CPAN
-auto_install;
 
 repository	'git://github.com/eserte/image-info.git';
 
@@ -74,7 +71,7 @@ predist:
 postdist:
 	\$(NOECHO) \$(ECHO) "*** Run the following commands:"
 	\$(NOECHO) \$(ECHO) cpan-upload \$(DISTVNAME).tar\$(SUFFIX)
-	\$(NOECHO) \$(ECHO) git tag \$(VERSION)
+	\$(NOECHO) \$(ECHO) git tag -a -m "* \$(VERSION)" \$(VERSION)
 	\$(NOECHO) \$(ECHO) git push
 	\$(NOECHO) \$(ECHO) git push --tags
 

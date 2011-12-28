@@ -18,7 +18,7 @@ package Image::Info;
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.31';
+$VERSION = '1.31_50';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -159,7 +159,7 @@ sub determine_file_format
    return "PPM" if /^P[1-6]/;
    return "XPM" if /(^\/\* XPM \*\/)|(static\s+char\s+\*\w+\[\]\s*=\s*{\s*"\d+)/;
    return "XBM" if /^(?:\/\*.*\*\/\n)?#define\s/;
-   return "SVG" if /^<\?xml/;
+   return "SVG" if /^<(\?xml|svg\b)/;
    return undef;
 }
 
