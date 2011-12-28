@@ -12,7 +12,7 @@ package Image::Info::SVG;
 
 use strict;
 use vars qw($VERSION @PREFER_MODULE $USING_MODULE);
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 @PREFER_MODULE = qw(Image::Info::SVG::XMLLibXMLReader
 		    Image::Info::SVG::XMLSimple
@@ -144,7 +144,7 @@ modify it under the same terms as Perl itself.
 
 =begin register
 
-MAGIC: /^<(\?xml|svg\b)/
+MAGIC: /^(<\?xml|[\012\015\t ]*<svg\b)/
 
 Provides a plethora of attributes and metadata of an SVG vector grafic.
 

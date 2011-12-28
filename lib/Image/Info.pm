@@ -13,12 +13,12 @@ package Image::Info;
 # modify it under the same terms as Perl v5.8.8 itself.
 #
 # Previoisly maintained by Tels - (c) 2006 - 2008.
-# Currently maintained by Slaven Rezic - (c) 2008 - 2010.
+# Currently maintained by Slaven Rezic - (c) 2008 - 2011.
 
 use strict;
 use vars qw($VERSION @EXPORT_OK);
 
-$VERSION = '1.31_50';
+$VERSION = '1.31_51';
 
 require Exporter;
 *import = \&Exporter::import;
@@ -159,7 +159,7 @@ sub determine_file_format
    return "PPM" if /^P[1-6]/;
    return "XPM" if /(^\/\* XPM \*\/)|(static\s+char\s+\*\w+\[\]\s*=\s*{\s*"\d+)/;
    return "XBM" if /^(?:\/\*.*\*\/\n)?#define\s/;
-   return "SVG" if /^<(\?xml|svg\b)/;
+   return "SVG" if /^(<\?xml|[\012\015\t ]*<svg\b)/;
    return undef;
 }
 
