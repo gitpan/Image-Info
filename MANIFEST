@@ -54,7 +54,6 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
-SIGNATURE
 t/00_basics.t
 t/bmp.t
 t/exif.t
@@ -71,3 +70,4 @@ t/tiff_e.t
 t/tiny-pgm.t
 TODO
 META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)
