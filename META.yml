@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Image-Info
-version:            1.32_52
+version:            1.33
 abstract:           Extract meta information from image files
 author:
     - Slaven Rezic <srezic@cpan.org>
