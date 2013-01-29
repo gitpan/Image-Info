@@ -75,6 +75,5 @@ t/tiff_e.t
 t/tiny-pgm.t
 t/wbmp.t
 TODO
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)
