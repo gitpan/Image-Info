@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.63.
+signed via the Module::Signature module, version 0.70.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,17 +15,19 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 6d73a8e85000c1fcf22376c01ee50d0c3960de02 .gitignore
-SHA1 0a7950151d2ea92ea3976cec5d754487f91ac59d CHANGES
+SHA1 1170d41185b79ed87ba77761b174c75368f61ae8 CHANGES
 SHA1 517bff80bcf518746150086148acaf8cfa37a17d CREDITS
-SHA1 c3a00ce2e7a31aaf09c60583779d21cc5ec822cd MANIFEST
+SHA1 d96d33c3279289903b75b470c87895f4153c7f8a MANIFEST
 SHA1 5c087a6c29747c19f5fa9ad503b66c76752aa443 MANIFEST.SKIP
-SHA1 88664ef2ed44d67373ddffbae654fc9f8f05d6ae META.yml
+SHA1 44466e45df2d3a025e1cc10b8e38265692ecbce3 META.json
+SHA1 25894d424090636c0aa77da53ad75d501917c21e META.yml
 SHA1 fd93fd0303c7694aab894d2bceceff8e82aae4d5 Makefile.PL
 SHA1 0184503d850cb0d34d0cfe26bd5af84d4cf97dbc README
 SHA1 36ea8eabe5ac80acc416411aae77b60e1480de1b TODO
-SHA1 16dc3f32f8c740cadc44c112773f48d06bb6a551 dev/Info.pm.tmpl
+SHA1 a24047447014a3bb9af5fe4bd5c566f6fd2de3ca dev/Info.pm.tmpl
 SHA1 c11e7408bd16d35b2116ee47eaac4f08266be902 dev/build.pl
 SHA1 38b386e67725abff64ea00abb8e92c46f38e2f59 exifdump
+SHA1 0e2ed058a8e6b748c639b08064f6782c4f51d643 img/bad-exif-1.jpg
 SHA1 c11f86df48ca57d0364c9afd1449683ebf1979f4 img/be.tif
 SHA1 951a303482fb78bc02c65e8310854a7be975bfca img/cynic_hang.jpg
 SHA1 49a6dcd04263d15377be6e7ced44f4e3ce01437c img/gps.jpg
@@ -61,7 +63,7 @@ SHA1 52e684ed4ae8089b3f9c83355dc12d3113673111 lib/Bundle/Image/Info/PNG.pm
 SHA1 8c1fec2e87c5e2ed5fde24d99b47f9c15ce5d318 lib/Bundle/Image/Info/SVG.pm
 SHA1 f348a5f14a0e674ef9077fd7c9a7eedd7b9462b5 lib/Bundle/Image/Info/XBM.pm
 SHA1 6495717c95aee79965e174147c0fb99b54b4f3a1 lib/Bundle/Image/Info/XPM.pm
-SHA1 50e023d652f8620417b7cf2c1fc062c522acaf75 lib/Image/Info.pm
+SHA1 cd7fe10aade3c928d5f2790e0624a4c2a2f03ebc lib/Image/Info.pm
 SHA1 e9d13e372a8c82aa3a8f47b0e34f1b20785d0330 lib/Image/Info/BMP.pm
 SHA1 6f63955e7d15c4c43355145e2a8c2952c64c1afa lib/Image/Info/GIF.pm
 SHA1 fb628cb66c566ab66a1b7953a1bb29cfde1c79c7 lib/Image/Info/ICO.pm
@@ -75,8 +77,9 @@ SHA1 75075891cb380be2a8960252e10d2a161d5bd069 lib/Image/Info/TIFF.pm
 SHA1 ed6fde11752d6450756c815b2dca25f9ad1740d9 lib/Image/Info/WBMP.pm
 SHA1 df9b8cfb6ee96e175a687a70e4668cd143a7a055 lib/Image/Info/XBM.pm
 SHA1 056636b2448669643af8f2fc70c915b62f3ee2db lib/Image/Info/XPM.pm
-SHA1 4dec2c58dfbe42750ae2de02a04843ee0e882898 lib/Image/TIFF.pm
+SHA1 60722e69e1f912a8ba8e79f4efe23441bc336db9 lib/Image/TIFF.pm
 SHA1 34e6def40374dc924ea7ef58c5aa04e04a783295 t/00_basics.t
+SHA1 a32c746f94f355b2337ea865b675bac438e71ccb t/bad_exif.t
 SHA1 aaf002b3e5103e15dad27d59bbf2ce7d84caf79e t/bmp.t
 SHA1 7cddff7d8bccd9b2e303554d31ad6f8891b7705b t/exif.t
 SHA1 86a7363e633fe7635f623f8a31cadebde585d0b3 t/fuji_s1000fd_substr_outside_of_string.t
@@ -93,9 +96,9 @@ SHA1 76e7e08522799dc0f39896c8925aff1d42b09da4 t/tiff_e.t
 SHA1 0a5f7c518af4b72fd76fa8def1f51e8691727bdd t/tiny-pgm.t
 SHA1 7d7708b0392491f75eb9b68289469c1a488453ca t/wbmp.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
+Version: GnuPG v1.4.13 (FreeBSD)
 
-iEYEARECAAYFAlEH9iYACgkQPsMxmWPfwkGlMwCZAWTh55YQsEOoF04F/f9mgNPe
-Dy0An3UFlc+UPlzoyS24zEHbcPGslK+f
-=tBKV
+iQBVAwUBUVyQu79kDNo3Bl+NAQK3OQH/aFEhnS33mYQUDA/wzCBNs4+TyXS8gofO
+qCg9mRa7uisOz11xgrPcyWkF+moGH1MRDpL8pdxL5lCrt1cJQn2SgA==
+=XjS7
 -----END PGP SIGNATURE-----

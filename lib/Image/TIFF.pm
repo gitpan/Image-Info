@@ -9,7 +9,7 @@ package Image::TIFF;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 my @types = (
   [ "BYTE",      "C1", 1],
@@ -822,7 +822,12 @@ sub new
 	while ($ifd) {
 	    push(@{$self->{ifd}}, $ifd);
 	    my($num_fields) = $self->unpack("x$ifd n", $_);
-	    my $next_ifd = $self->unpack("N", substr($_, $ifd + 2 + $num_fields*12, 4));
+
+	    my $substr_ifd = substr($_, $ifd + 2 + $num_fields*12, 4);
+	    last unless defined $substr_ifd; # bad TIFF header, eg: substr idx > length($substr_ifd)
+
+	    my $next_ifd = $self->unpack("N", $substr_ifd);
+
 	    # guard against (bug #26127)
 	    $next_ifd = 0 if $next_ifd > length($_);
 	    # guard against looping ifd (bug #26130)
