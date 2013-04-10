@@ -47,11 +47,11 @@
          }
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "repository" : {
          "url" : "git://github.com/eserte/image-info.git"
       }
    },
-   "version" : "1.34_50"
+   "version" : "1.35"
 }
