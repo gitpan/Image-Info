@@ -9,7 +9,7 @@ package Image::TIFF;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 my @types = (
   [ "BYTE",      "C1", 1],
@@ -515,7 +515,7 @@ my %exif_tags = (
 		2 => "Fluorescent",
 		3 => "Tungsten",
 		4 => "Flash",
-		# 5 .. 8 reserveed in EXIF 2.2
+		# 5 .. 8 reserved in EXIF 2.2
 		9 => "Fine weather",
 		10 => "Cloudy weather",
 		11 => "Shade",
@@ -1010,7 +1010,7 @@ sub add_fields
 		    next FIELD;
 		}
 		if (my $sub = $tag->{__ARRAYOFFSET__}) {
-		    my $prefix = $tag = $self->{tag_prefix} . '-' if $self->{tag_prefix};	    
+		    my $prefix; $prefix = $tag = $self->{tag_prefix} . '-' if $self->{tag_prefix};	    
 		    for (my $i=0; $i < @$val; $i++) {
 		      if ( exists($sub->{$i}) )
 		      { if ( ref($sub->{$i}) eq "HASH" && exists($sub->{$i}->{__TAG__}) ) 

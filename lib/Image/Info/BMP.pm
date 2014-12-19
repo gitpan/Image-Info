@@ -1,5 +1,5 @@
 package Image::Info::BMP;
-$VERSION = '1.03';
+$VERSION = '1.04';
 use strict;
 
 use constant _CAN_LITTLE_ENDIAN_PACK => $] >= 5.009002;
@@ -50,7 +50,7 @@ sub process_file {
 					'JPEG',		#V5
 					'PNG',		#V5
 					]->[$header[10]]);
-    #Version 5 Header ammendements
+    #Version 5 Header amendments
     # XXX Discard for now, need a test image
     if( $header[5] > 40 ){
 	read($source, $buf, $header[5]-40);  # XXX test
@@ -102,7 +102,7 @@ __END__
 
 =head1 NAME
 
-Image::Info::BMP - Windows Device Indepdent Bitmap support for Image::Info
+Image::Info::BMP - Windows Device Independent Bitmap support for Image::Info
 
 =head1 SYNOPSIS
 
